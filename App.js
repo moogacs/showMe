@@ -14,6 +14,7 @@ import {
   View,
   Text,
   StatusBar,
+  Button,
 } from 'react-native';
 
 import {
@@ -40,7 +41,12 @@ const App = () => {
           )}
           <View style={styles.body}>
             <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Step One</Text>
+              <Text style={styles.sectionTitle}>Step One</Text>              
+              <Button
+                onPress={console.log("hello")}
+                title="Route"
+                color="#841584"
+              />
               <Text style={styles.sectionDescription}>
                 Edit <Text style={styles.highlight}>App.js</Text> to change this
                 screen and then come back to see your edits.
@@ -51,12 +57,22 @@ const App = () => {
               <Text style={styles.sectionDescription}>
                 <ReloadInstructions />
               </Text>
+              <Button
+                onPress={console.log("hello")}
+                title="Left listener"
+                color="#841584"
+              />
             </View>
             <View style={styles.sectionContainer}>
               <Text style={styles.sectionTitle}>Debug</Text>
               <Text style={styles.sectionDescription}>
-                <DebugInstructions />
+                <DebugInstructions />                
               </Text>
+              <Button
+                  onPress={console.log("hello")}
+                  title="Right listener"
+                  color="#841584"
+                />
             </View>
             <View style={styles.sectionContainer}>
               <Text style={styles.sectionTitle}>Learn More</Text>
@@ -100,6 +116,10 @@ const styles = StyleSheet.create({
   },
   highlight: {
     fontWeight: '700',
+  },
+  button: {
+    backgroundColor: Colors.black,
+    width: 100,
   },
   footer: {
     color: Colors.dark,
