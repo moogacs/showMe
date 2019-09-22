@@ -2,16 +2,27 @@ let express = require("express")
 app = express()
 port = process.env.PORT || 3000;
 
-// GET method route
-app.get('/', function (req, res) {
-    res.send('GET request to the homepage')
-})
+mongoose = require('mongoose'),
+Task = require('./api/models/showMeModel'), //created model loading here
+bodyParser = require('body-parser');
 
-  // POST method route
-app.post('/register', function (req, res) {
-    console.log(req)
-    res.send('Trying to add user')
-})
+// mongoose instance connection url connection
+mongoose.Promise = global.Promise;
+mongoose.connect('mongodb://localhost/showMeDB'); 
+
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+  // we're connected!
+});
+
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+
+var routes = require('./api/routes/showMeRoutes'); //importing route
+routes(app); //register the route
 
 app.listen(port)
 console.log("showMe listening on "+ port)
