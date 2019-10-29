@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">showMe</string>
+    <string name="app_name">Show Me</string>
+    <string name="title_activity_main_view">Map</string>
 </resources>
