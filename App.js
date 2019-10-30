@@ -1,12 +1,4 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
-
-import React, {Fragment, Component} from 'react';
+import React from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -14,7 +6,6 @@ import {
   View,
   Text,
   StatusBar,
-  Button,
 } from 'react-native';
 
 import {
@@ -24,46 +15,116 @@ import {
   DebugInstructions,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 
 
-function onPressRoute(){
-  alert("hello")
-}
+const styles = StyleSheet.create({
+  scrollView: {
+    backgroundColor: Colors.lighter,
+  },
+  engine: {
+    position: 'absolute',
+    right: 0,
+  },
+  body: {
+    backgroundColor: Colors.white,
+  },
+  sectionContainer: {
+    marginTop: 32,
+    paddingHorizontal: 24,
+  },
+  sectionTitle: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: Colors.black,
+  },
+  sectionDescription: {
+    marginTop: 8,
+    fontSize: 18,
+    fontWeight: '400',
+    color: Colors.dark,
+  },
+  highlight: {
+    fontWeight: '700',
+  },
+  footer: {
+    color: Colors.dark,
+    fontSize: 12,
+    fontWeight: '600',
+    padding: 4,
+    paddingRight: 12,
+    textAlign: 'right',
+  },
+  container: {
+    width: 100,
+    height: 100,
+  },
+});
 
-export default class MainView extends Component {
-  render() {
-    return (
-      <Fragment>
-      <View style={{
-        flex: 3,
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'stretch',
-      }}>
-          <View style={{ flex: 3,justifyContent: 'center',backgroundColor: 'blue'}}>
-            <Button
-              // onPress={onPressRoute()}
-              title="Route"
-              color="#fff"
-              />
+
+
+// /**
+//  * Sample React Native App
+//  * https://github.com/facebook/react-native
+//  *
+//  * @format
+//  * @flow
+//  */
+
+
+
+const App: () => React$Node = () => {
+  return (
+    <>
+      <StatusBar barStyle="dark-content" />
+      <SafeAreaView>
+      <View style={styles.scrollView}>
+  <MapView
+      provider={PROVIDER_GOOGLE}
+      style={{ ...StyleSheet.absoluteFillObject }}
+    />
+</View>
+        {/* <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          style={styles.scrollView}>
+          <Header />
+          {global.HermesInternal == null ? null : (
+            <View style={styles.engine}>
+              <Text style={styles.footer}>Engine: Hermes</Text>
+            </View>
+          )}
+          <View style={styles.body}>
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>Step One</Text>
+              <Text style={styles.sectionDescription}>
+                Edit <Text style={styles.highlight}>App.js</Text> to change this
+                screen and then come back to see your edits.
+              </Text>
+            </View>
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>See Your Changes</Text>
+              <Text style={styles.sectionDescription}>
+                <ReloadInstructions />
+              </Text>
+            </View>
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>Debug</Text>
+              <Text style={styles.sectionDescription}>
+                <DebugInstructions />
+              </Text>
+            </View>
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>Learn More</Text>
+              <Text style={styles.sectionDescription}>
+                Read the docs to discover what to do next:
+              </Text>
+            </View>
+            <LearnMoreLinks />
           </View>
-          <View style={{ flex: 3,justifyContent: 'center',backgroundColor: 'green'}}>
-          <Button
-              // onPress={onPressRoute()}
-              title="Left listener"
-              color="#fff"
-              />
-        </View>
-        <View style={{ flex: 3,justifyContent: 'center',backgroundColor: 'yellow'}}>
-        <Button
-              // onPress={onPressRoute()}
-              title="Right listener"
-              color="#000"
-              />
-        </View>
-      </View>    
-    </Fragment>
-    );
-  }
-}
+        </ScrollView> */}
+      </SafeAreaView>
+    </>
+  );
+};
 
+export default App;
