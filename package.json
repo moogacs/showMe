@@ -21,7 +21,7 @@
     "express": "^4.17.1",
     "jest": "^24.9.0",
     "metro-react-native-babel-preset": "^0.56.0",
-    "mongoose": "^5.7.1",
+    "mongoose": "^5.7.5",
     "nodemon": "^1.19.1",
     "react-native-maps": "^0.26.1",
     "react-test-renderer": "16.8.6"
