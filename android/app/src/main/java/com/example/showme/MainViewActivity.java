@@ -94,7 +94,7 @@ public class MainViewActivity extends FragmentActivity implements OnMapReadyCall
 
 
         if (!Places.isInitialized()) {
-            Places.initialize(getApplicationContext(), "AIzaSyCXivtwTmdzZFhzEKrb01qhdOWeO29OOr0");
+            Places.initialize(getApplicationContext(), "Key");
         }
         // Initialize the AutocompleteSupportFragment.
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
