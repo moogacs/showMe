@@ -94,7 +94,7 @@ public class MainViewActivity extends FragmentActivity implements OnMapReadyCall
 
 
         if (!Places.isInitialized()) {
-            Places.initialize(getApplicationContext(), "Key");
+            Places.initialize(getApplicationContext(), getString(R.string.google_maps_key));
         }
         // Initialize the AutocompleteSupportFragment.
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
@@ -379,8 +379,8 @@ public class MainViewActivity extends FragmentActivity implements OnMapReadyCall
 
             // Invokes the thread for parsing the JSON data
             parserTask.execute(result);
-            //@TODO analyze route
-            Log.i(TAG, "route: " + parserTask.execute(result));
+//            //@TODO analyze route
+//            Log.i(TAG, "route: " + parserTask.execute(result));
 
         }
     }
