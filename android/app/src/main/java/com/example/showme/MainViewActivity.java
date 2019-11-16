@@ -3,6 +3,7 @@ package com.example.showme;
 
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.icu.text.Transliterator;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -17,11 +18,28 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Dot;
+import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.nearby.Nearby;
+import com.google.android.gms.nearby.connection.ConnectionInfo;
+import com.google.android.gms.nearby.connection.ConnectionLifecycleCallback;
+import com.google.android.gms.nearby.connection.ConnectionResolution;
+import com.google.android.gms.nearby.connection.ConnectionsStatusCodes;
+import com.google.android.gms.nearby.connection.DiscoveredEndpointInfo;
+import com.google.android.gms.nearby.connection.DiscoveryOptions;
+import com.google.android.gms.nearby.connection.EndpointDiscoveryCallback;
+import com.google.android.gms.nearby.connection.Payload;
+import com.google.android.gms.nearby.connection.PayloadCallback;
+import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
+import com.google.android.gms.nearby.connection.Strategy;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 //import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.Places;
@@ -55,6 +73,10 @@ public class MainViewActivity extends FragmentActivity implements OnMapReadyCall
     private LatLng mDestination;
     private Polyline mPolyline;
 
+    private static final int PATTERN_GAP_LENGTH_PX = 5;  // 1
+    private static final Gap GAP = new Gap(PATTERN_GAP_LENGTH_PX);
+    private static final Dot DOT = new Dot();
+    private static final List<PatternItem> PATTERN_DOTTED = Arrays.asList(DOT, GAP);
     // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient mFusedLocationProviderClient;
 
@@ -73,6 +95,8 @@ public class MainViewActivity extends FragmentActivity implements OnMapReadyCall
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +107,9 @@ public class MainViewActivity extends FragmentActivity implements OnMapReadyCall
 
         // Retrieve the content view that renders the map.
         setContentView(R.layout.activity_main_view);
+
+        ShowMeNearby.startDiscovery();
+
 
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
@@ -109,14 +136,16 @@ public class MainViewActivity extends FragmentActivity implements OnMapReadyCall
             public void onPlaceSelected(Place place) {
                 // TODO: Get info about the selected place.
 
+                // clear all previous markers and routes
+                mMap.clear();
                 // target marker
                 mMap.addMarker(new MarkerOptions()
                                 .position(place.getLatLng()));
 
                 // user marker
-                mMap.addMarker(new MarkerOptions()
-                        .position(new LatLng(mLastKnownLocation.getLatitude(),
-                                mLastKnownLocation.getLongitude())));
+//                mMap.addMarker(new MarkerOptions()
+//                        .position(new LatLng(mLastKnownLocation.getLatitude(),
+//                                mLastKnownLocation.getLongitude())));
 
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
                 mMap.getUiSettings().setZoomControlsEnabled(true);
@@ -127,7 +156,8 @@ public class MainViewActivity extends FragmentActivity implements OnMapReadyCall
                 mOrigin = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
                 mDestination = place.getLatLng();
                 drawRoute();
-
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
+                //mMap.animateCamera(CameraUpdateFactory.zoomBy(5.0f));
             }
 
             @Override
@@ -432,10 +462,12 @@ public class MainViewActivity extends FragmentActivity implements OnMapReadyCall
                     points.add(position);
                 }
 
+
                 // Adding all the points in the route to LineOptions
                 lineOptions.addAll(points);
-                lineOptions.width(8);
+                lineOptions.width(30);
                 lineOptions.color(Color.BLUE);
+                lineOptions.pattern(PATTERN_DOTTED);
             }
 
             // Drawing polyline in the Google Map for the i-th route
@@ -449,4 +481,5 @@ public class MainViewActivity extends FragmentActivity implements OnMapReadyCall
                 Toast.makeText(getApplicationContext(),"No route is found", Toast.LENGTH_LONG).show();
         }
     }
+
 }

@@ -1,12 +1,16 @@
 package com.example.showme;
 
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.content.Context;
+
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.util.Log;
+
 import java.net.ServerSocket;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,6 +28,11 @@ public class MainActivity extends AppCompatActivity {
     private List<NsdServiceInfo> mDiscoveredServices = new ArrayList<>();
     private Vibrator vibrator;
     public static int leftView = 0, rightView = 0, mainView = 0;
+
+
+    private static MainActivity mContext;
+
+
 
     private NsdManager.DiscoveryListener mDiscoveryListener = new NsdManager.DiscoveryListener() {
         @Override
@@ -70,13 +79,16 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onServiceResolved(NsdServiceInfo serviceInfo) {
-
+            mServiceInfo = serviceInfo;
+            int port = mServiceInfo.getPort();
+//            InetAddress host = mServiceInfo.getHost();
         }
     };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mContext = this;
         setContentView(R.layout.activity_main);
         initializeServerSocket();
         initializeRegistrationListener();
@@ -86,7 +98,6 @@ public class MainActivity extends AppCompatActivity {
         Log.d("Port","" + mLocalPort);
         Log.d("Name","" + mServiceInfo.getServiceName());
         Log.d("Type","" + mServiceInfo.getServiceType());
-
         openDialog();
     }
 
@@ -153,5 +164,7 @@ public class MainActivity extends AppCompatActivity {
         mNsdManager.stopServiceDiscovery(mDiscoveryListener);
     }
 
-
+    public static MainActivity getContext() {
+        return mContext;
+    }
 }

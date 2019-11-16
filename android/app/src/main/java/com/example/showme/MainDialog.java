@@ -5,11 +5,28 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.nearby.Nearby;
+import com.google.android.gms.nearby.connection.AdvertisingOptions;
+import com.google.android.gms.nearby.connection.ConnectionInfo;
+import com.google.android.gms.nearby.connection.ConnectionLifecycleCallback;
+import com.google.android.gms.nearby.connection.ConnectionResolution;
+import com.google.android.gms.nearby.connection.ConnectionsStatusCodes;
+import com.google.android.gms.nearby.connection.Payload;
+import com.google.android.gms.nearby.connection.PayloadCallback;
+import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
+import com.google.android.gms.nearby.connection.Strategy;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDialogFragment;
 
 public class MainDialog extends AppCompatDialogFragment {
+
+    private static final String TAG = MainViewActivity.class.getSimpleName();
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -88,11 +105,13 @@ public class MainDialog extends AppCompatDialogFragment {
         return builder.create();
     }
 
-    public void toSideViewActivity(String  name)
+    public void toSideViewActivity(String  activityName)
     {
         Intent intent = new Intent(getActivity(), SideViewActivity.class);
-        intent.putExtra("activity", name);
+        intent.putExtra("activity", activityName);
         startActivity(intent);
+        ShowMeNearby.startAdvertising();
+
     }
 
     public void toMainViewActivity()
@@ -100,6 +119,5 @@ public class MainDialog extends AppCompatDialogFragment {
         Intent intent = new Intent(getActivity(), MainViewActivity.class);
         startActivity(intent);
     }
-
 
 }
