@@ -1,6 +1,6 @@
 package com.example.showme;
 
-import android.content.Context;
+import android.os.Vibrator;
 import android.util.Log;
 
 import com.google.android.gms.nearby.Nearby;
@@ -15,6 +15,7 @@ import com.google.android.gms.nearby.connection.EndpointDiscoveryCallback;
 import com.google.android.gms.nearby.connection.Payload;
 import com.google.android.gms.nearby.connection.PayloadCallback;
 import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
+import com.google.android.gms.nearby.connection.PayloadTransferUpdate.Status;
 import com.google.android.gms.nearby.connection.Strategy;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -23,15 +24,18 @@ import androidx.annotation.NonNull;
 
 public class ShowMeNearby {
 
+    private static String leftEndpointId;
+    private static String rightEndpointId;
+    private static boolean firstDevice;
+
     private static final String TAG = MainViewActivity.class.getSimpleName();
 
     static Payload bytesPayload = Payload.fromBytes("Hello world".getBytes());
     static String SERVICE_ID = "com.example.showme";
 
-
     public static void startAdvertising() {
         AdvertisingOptions advertisingOptions =
-                new AdvertisingOptions.Builder().setStrategy(Strategy.P2P_STAR).build();
+                new AdvertisingOptions.Builder().setStrategy(Strategy.P2P_CLUSTER ).build();
         Nearby.getConnectionsClient(MainActivity.getContext())
                 .startAdvertising("candidate", SERVICE_ID, mConnectionLifecycleCallback, advertisingOptions)
                 .addOnSuccessListener(
@@ -58,7 +62,7 @@ public class ShowMeNearby {
 
     public static void startDiscovery() {
         DiscoveryOptions discoveryOptions =
-                new DiscoveryOptions.Builder().setStrategy(Strategy.P2P_STAR).build();
+                new DiscoveryOptions.Builder().setStrategy(Strategy.P2P_CLUSTER ).build();
         Nearby.getConnectionsClient(MainActivity.getContext())
                 .startDiscovery(SERVICE_ID, mEndpointDiscoveryCallback, discoveryOptions)
                 .addOnSuccessListener(
@@ -96,6 +100,15 @@ public class ShowMeNearby {
                         case ConnectionsStatusCodes.STATUS_OK:
                             // We're connected! Can now start sending and receiving data.
                             Log.i(TAG, "Status ok  " );
+                            Log.i(TAG, endpointId );
+                            if (firstDevice == true){
+                                leftEndpointId = endpointId ;
+                                firstDevice = false;
+                            } else {
+                                rightEndpointId = endpointId ;
+                                firstDevice = true;
+                            }
+
                             break;
                         case ConnectionsStatusCodes.STATUS_CONNECTION_REJECTED:
                             // The connection was rejected by one or both sides.
@@ -164,11 +177,35 @@ public class ShowMeNearby {
             // A new payload is being sent over.
             byte[] receivedBytes = payload.asBytes();
             Log.i(TAG, "rec: " + receivedBytes.toString());
+            SideViewActivity.alterTheText();
+            SideViewActivity.vibrate();
+
         }
 
         @Override
         public void onPayloadTransferUpdate(String endpointId, PayloadTransferUpdate update) {
             // Payload progress has updated.
+            if (update.getStatus() == Status.SUCCESS) {
+                Log.i(TAG, "successful update");
+            }
         }
     };
+
+
+    public static void changeTheText() {
+//        Log.i(TAG, "changeTheText was called ");
+//        Nearby.getConnectionsClient(MainActivity.getContext()).sendPayload(leftEndpointId, bytesPayload);
+//        Nearby.getConnectionsClient(MainActivity.getContext()).sendPayload(rightEndpointId, bytesPayload);
+
+        MainActivity.vibrate();
+    }
+
+    public static void vibrateLeft(){
+        Nearby.getConnectionsClient(MainActivity.getContext()).sendPayload(leftEndpointId, bytesPayload);
+    }
+
+    public static void vibrateRight(){
+        Nearby.getConnectionsClient(MainActivity.getContext()).sendPayload(rightEndpointId, bytesPayload);
+    }
+
 }

@@ -7,11 +7,18 @@ import android.icu.text.Transliterator;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -25,23 +32,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.nearby.Nearby;
-import com.google.android.gms.nearby.connection.ConnectionInfo;
-import com.google.android.gms.nearby.connection.ConnectionLifecycleCallback;
-import com.google.android.gms.nearby.connection.ConnectionResolution;
-import com.google.android.gms.nearby.connection.ConnectionsStatusCodes;
-import com.google.android.gms.nearby.connection.DiscoveredEndpointInfo;
-import com.google.android.gms.nearby.connection.DiscoveryOptions;
-import com.google.android.gms.nearby.connection.EndpointDiscoveryCallback;
+import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.gms.nearby.connection.Payload;
-import com.google.android.gms.nearby.connection.PayloadCallback;
-import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
-import com.google.android.gms.nearby.connection.Strategy;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-//import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
@@ -66,7 +60,6 @@ import java.util.HashMap;
 import java.util.List;
 
 public class MainViewActivity extends FragmentActivity implements OnMapReadyCallback {
-
     private static final String TAG = MainViewActivity.class.getSimpleName();
     private GoogleMap mMap;
     private LatLng mOrigin;
@@ -95,7 +88,18 @@ public class MainViewActivity extends FragmentActivity implements OnMapReadyCall
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
 
+    private static boolean requestingLocationUpdates;
+    private LocationCallback locationCallback;
 
+
+    private static TextView LatText;
+    private static TextView LngText;
+    private static TextView DistanceText;
+
+    private ArrayList<LatLng> leftTurnLatLngPoints;
+    private ArrayList<LatLng> rightTurnLatLngPoints;
+
+    private String REQUESTING_LOCATION_UPDATES_KEY = "REQUESTING_LOCATION_UPDATES_KEY";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,13 +107,20 @@ public class MainViewActivity extends FragmentActivity implements OnMapReadyCall
         // Retrieve location and camera position from saved instance state.
         if (savedInstanceState != null) {
             mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
+            // Update the value of requestingLocationUpdates from the Bundle.
+            if (savedInstanceState.keySet().contains(REQUESTING_LOCATION_UPDATES_KEY)) {
+                requestingLocationUpdates = savedInstanceState.getBoolean(REQUESTING_LOCATION_UPDATES_KEY);
+            }
         }
 
         // Retrieve the content view that renders the map.
         setContentView(R.layout.activity_main_view);
-
+        ShowMeNearby.startAdvertising();
         ShowMeNearby.startDiscovery();
 
+        LatText = findViewById(R.id.lat);
+        LngText = findViewById(R.id.lng);
+        DistanceText = findViewById(R.id.distanceInM);
 
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
@@ -141,7 +152,6 @@ public class MainViewActivity extends FragmentActivity implements OnMapReadyCall
                 // target marker
                 mMap.addMarker(new MarkerOptions()
                                 .position(place.getLatLng()));
-
                 // user marker
 //                mMap.addMarker(new MarkerOptions()
 //                        .position(new LatLng(mLastKnownLocation.getLatitude(),
@@ -158,6 +168,8 @@ public class MainViewActivity extends FragmentActivity implements OnMapReadyCall
                 drawRoute();
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
                 //mMap.animateCamera(CameraUpdateFactory.zoomBy(5.0f));
+
+                startLocationUpdates();
             }
 
             @Override
@@ -166,8 +178,85 @@ public class MainViewActivity extends FragmentActivity implements OnMapReadyCall
                 Log.i(TAG, "An error occurred: " + status);
             }
         });
+
+
+
+
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+                for (Location location : locationResult.getLocations()) {
+                    // Update UI with location data
+                    // ...
+//                    mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(), location.getLongitude())));
+
+                    LatText.setText(String.valueOf(location.getLatitude()));
+                    LngText.setText(String.valueOf(location.getLongitude()));
+
+
+                    Location leftTurnLocation = new Location("");
+                    Location rightTurnLocation = new Location("");
+
+                    for(int j=0;j<leftTurnLatLngPoints.size();j++){
+                        leftTurnLocation.setLongitude(leftTurnLatLngPoints.get(j).longitude);
+                        leftTurnLocation.setLatitude(leftTurnLatLngPoints.get(j).latitude);
+                    }
+
+                    for(int j=0;j<rightTurnLatLngPoints.size();j++){
+                        rightTurnLocation.setLongitude(rightTurnLatLngPoints.get(j).longitude);
+                        rightTurnLocation.setLatitude(rightTurnLatLngPoints.get(j).latitude);
+                    }
+
+
+                    // TODO change to left and right location points to vibrate
+
+                    if(leftTurnLocation.distanceTo(location) < 5){
+                        DistanceText.setText(String.valueOf(leftTurnLocation.distanceTo(location)));
+                        ShowMeNearby.changeTheText();
+                        ShowMeNearby.vibrateLeft();
+                    }
+
+                    if(rightTurnLocation.distanceTo(location) < 5){
+                        DistanceText.setText(String.valueOf(rightTurnLocation.distanceTo(location)));
+                        ShowMeNearby.changeTheText();
+                        ShowMeNearby.vibrateRight();
+                    }
+
+                }
+            };
+        };
+
     }
 
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (requestingLocationUpdates) {
+            startLocationUpdates();
+        }
+    }
+
+
+    private void startLocationUpdates() {
+        mFusedLocationProviderClient.requestLocationUpdates(new LocationRequest().setInterval(1),
+                locationCallback,
+                Looper.getMainLooper());
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopLocationUpdates();
+    }
+
+    private void stopLocationUpdates() {
+        mFusedLocationProviderClient.removeLocationUpdates(locationCallback);
+    }
     /**
      * Saves the state of the map when the activity is paused.
      */
@@ -176,6 +265,8 @@ public class MainViewActivity extends FragmentActivity implements OnMapReadyCall
         if (mMap != null) {
             outState.putParcelable(KEY_CAMERA_POSITION, mMap.getCameraPosition());
             outState.putParcelable(KEY_LOCATION, mLastKnownLocation);
+            outState.putBoolean(REQUESTING_LOCATION_UPDATES_KEY,
+                    requestingLocationUpdates);
             super.onSaveInstanceState(outState);
         }
     }
@@ -265,6 +356,9 @@ public class MainViewActivity extends FragmentActivity implements OnMapReadyCall
                                            @NonNull String permissions[],
                                            @NonNull int[] grantResults) {
         mLocationPermissionGranted = false;
+        Log.i(TAG,  String.valueOf(requestCode));
+        Log.i(TAG,  String.valueOf(grantResults));
+
         switch (requestCode) {
             case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
                 // If request is cancelled, the result arrays are empty.
@@ -409,9 +503,6 @@ public class MainViewActivity extends FragmentActivity implements OnMapReadyCall
 
             // Invokes the thread for parsing the JSON data
             parserTask.execute(result);
-//            //@TODO analyze route
-//            Log.i(TAG, "route: " + parserTask.execute(result));
-
         }
     }
 
@@ -428,12 +519,40 @@ public class MainViewActivity extends FragmentActivity implements OnMapReadyCall
             try{
                 jObject = new JSONObject(jsonData[0]);
                 DirectionsJSONParser parser = new DirectionsJSONParser();
-
                 // Starts parsing data
                 routes = parser.parse(jObject);
+
+
+                List<HashMap<String, HashMap<String, Double>>> turnPointsData = parser.parseTurnPoint(jObject);
+                leftTurnLatLngPoints = new ArrayList<>();
+                rightTurnLatLngPoints = new ArrayList<>();
+
+                Log.i(TAG, "routePoints: " + turnPointsData.toString() );
+                // Fetching all the points in i-th route
+                for(int j=0;j<turnPointsData.size();j++){
+                    HashMap<String, HashMap<String, Double>> point = turnPointsData.get(j);
+                    if(point.containsKey("left")){
+                        HashMap<String, Double> LatLng = point.get("left");
+                        double lat = LatLng.get("lat");
+                        double lng = LatLng.get("lng");
+                        LatLng position = new LatLng(lat, lng);
+                        leftTurnLatLngPoints.add(position);
+                    }
+
+                    if(point.containsKey("right")){
+                        HashMap<String, Double> LatLng = point.get("right");
+                        double lat = LatLng.get("lat");
+                        double lng = LatLng.get("lng");
+                        LatLng position = new LatLng(lat, lng);
+                        rightTurnLatLngPoints.add(position);
+                    }
+                }
+
+
             }catch(Exception e){
                 e.printStackTrace();
             }
+
             return routes;
         }
 
@@ -468,6 +587,18 @@ public class MainViewActivity extends FragmentActivity implements OnMapReadyCall
                 lineOptions.width(30);
                 lineOptions.color(Color.BLUE);
                 lineOptions.pattern(PATTERN_DOTTED);
+
+
+                for(int j=0;j<leftTurnLatLngPoints.size();j++){
+                    mMap.addMarker(new MarkerOptions()
+                            .position(leftTurnLatLngPoints.get(j)).title("Left").snippet("Left"));
+                }
+
+                for(int j=0;j<rightTurnLatLngPoints.size();j++){
+                    mMap.addMarker(new MarkerOptions()
+                            .position(rightTurnLatLngPoints.get(j)).title("Right").snippet("Right"));
+                }
+
             }
 
             // Drawing polyline in the Google Map for the i-th route
@@ -481,5 +612,12 @@ public class MainViewActivity extends FragmentActivity implements OnMapReadyCall
                 Toast.makeText(getApplicationContext(),"No route is found", Toast.LENGTH_LONG).show();
         }
     }
+
+    // the test button
+    public void testSend(View view) {
+        ShowMeNearby.changeTheText();
+        Log.i(TAG, "test button was pressed ");
+    }
+
 
 }
