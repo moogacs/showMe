@@ -33,29 +33,10 @@ public class DirectionsJSONParser {
                 for(int j=0;j<jLegs.length();j++){
                     jSteps = ( (JSONObject)jLegs.get(j)).getJSONArray("steps");
 
-
-//                    String maneuver =jSteps[].get("maneuver");
-//                    Log.i("impo", maneuver);
-
                     /** Traversing all steps */
                     for(int k=0;k<jSteps.length();k++){
                         String polyline = "";
                         polyline = (String)((JSONObject)((JSONObject)jSteps.get(k)).get("polyline")).get("points");
-//
-//
-//                        try {
-//                            String maneuver = (String) ((JSONObject) jSteps.get(k)).get("maneuver");
-//                            if(maneuver.indexOf("right") > -1){
-//                                Number lat = (Number)((JSONObject)((JSONObject)jSteps.get(k)).get("start_location")).get("lat");
-//                                Number lng = (Number) ((JSONObject)((JSONObject)jSteps.get(k)).get("start_location")).get("lng");
-//                                Log.i("impo",     maneuver);
-//                                Log.i("impo",    lat.toString());
-//                                Log.i("impo",    lng.toString());
-//                            }
-//
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }
 
                         List<LatLng> list = decodePoly(polyline);
 
@@ -101,7 +82,7 @@ public class DirectionsJSONParser {
                     /** Traversing all steps */
                     for(int k=0;k<jSteps.length();k++){
                         try {
-                            String maneuver = (String) ((JSONObject) jSteps.get(k)).get("maneuver");
+                            String maneuver = (String) ((JSONObject) jSteps.get(k)).get("");
                             if(maneuver.indexOf("right") > -1){
                                 Double lat = (Double)((JSONObject)((JSONObject)jSteps.get(k)).get("start_location")).get("lat");
                                 Double lng = (Double) ((JSONObject)((JSONObject)jSteps.get(k)).get("start_location")).get("lng");

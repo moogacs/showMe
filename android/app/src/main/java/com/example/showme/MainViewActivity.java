@@ -214,13 +214,13 @@ public class MainViewActivity extends FragmentActivity implements OnMapReadyCall
 
                     // TODO change to left and right location points to vibrate
 
-                    if(leftTurnLocation.distanceTo(location) < 5){
+                    if(leftTurnLocation.distanceTo(location) < 10){
                         DistanceText.setText(String.valueOf(leftTurnLocation.distanceTo(location)));
                         ShowMeNearby.changeTheText();
                         ShowMeNearby.vibrateLeft();
                     }
 
-                    if(rightTurnLocation.distanceTo(location) < 5){
+                    if(rightTurnLocation.distanceTo(location) < 10){
                         DistanceText.setText(String.valueOf(rightTurnLocation.distanceTo(location)));
                         ShowMeNearby.changeTheText();
                         ShowMeNearby.vibrateRight();
@@ -244,7 +244,7 @@ public class MainViewActivity extends FragmentActivity implements OnMapReadyCall
 
 
     private void startLocationUpdates() {
-        mFusedLocationProviderClient.requestLocationUpdates(new LocationRequest().setInterval(1),
+        mFusedLocationProviderClient.requestLocationUpdates(new LocationRequest().setPriority(100).setInterval(5),
                 locationCallback,
                 Looper.getMainLooper());
     }
@@ -342,11 +342,12 @@ public class MainViewActivity extends FragmentActivity implements OnMapReadyCall
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true;
-            startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
         } else {
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+
+            startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
         }
     }
 
@@ -616,12 +617,6 @@ public class MainViewActivity extends FragmentActivity implements OnMapReadyCall
             }else
                 Toast.makeText(getApplicationContext(),"No route is found", Toast.LENGTH_LONG).show();
         }
-    }
-
-    // the test button
-    public void testSend(View view) {
-        ShowMeNearby.changeTheText();
-        Log.i(TAG, "test button was pressed ");
     }
 
 
