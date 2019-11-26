@@ -100,5 +100,5 @@ parse()
 parseTurnPoint()
 > After Traversing the steps, searching for <b>maneuver</b> and then split them to left/right  Langitude and Latitude points.
 
-#####decodePoly()
+#decodePoly()
 >Method to decode polyline points [src](jeffreysambells.com/2010/05/27/decoding-polylines-from-google-maps-direction-api-with-java)
