@@ -100,6 +100,7 @@ public class ShowMeNearby {
                         case ConnectionsStatusCodes.STATUS_OK:
                             // We're connected! Can now start sending and receiving data.
                             Log.i(TAG, "Status ok  " );
+                            MainActivity.vibrate();
                             Log.i(TAG, endpointId );
                             if (firstDevice == true){
                                 leftEndpointId = endpointId ;

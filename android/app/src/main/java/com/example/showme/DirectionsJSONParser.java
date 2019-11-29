@@ -82,7 +82,7 @@ public class DirectionsJSONParser {
                     /** Traversing all steps */
                     for(int k=0;k<jSteps.length();k++){
                         try {
-                            String maneuver = (String) ((JSONObject) jSteps.get(k)).get("");
+                            String maneuver = (String) ((JSONObject) jSteps.get(k)).get("maneuver");
                             if(maneuver.indexOf("right") > -1){
                                 Double lat = (Double)((JSONObject)((JSONObject)jSteps.get(k)).get("start_location")).get("lat");
                                 Double lng = (Double) ((JSONObject)((JSONObject)jSteps.get(k)).get("start_location")).get("lng");
