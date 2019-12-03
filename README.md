@@ -1,4 +1,4 @@
-![ShowMe example](showMeIco.png?raw=true "logo" =16x)
+![ShowMe example](showMeIco.png?raw=true "logo")
 
 #ShowMe android app
 ## Description
