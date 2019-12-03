@@ -1,4 +1,5 @@
- ![ShowMe example](showMeIco.png?raw=true "logo" =16x)
+![ShowMe example](showMeIco.png?raw=true "logo" =16x)
+
 #ShowMe android app
 ## Description
 A navigation software prototype to help the visually impaired people navigate through their ways in an easier way. The idea is to have two pieces of small gadgets in each of the pockets of the person which indicate the direction; be it left or right. a project for Hamburg of applied science university (HAW)
