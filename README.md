@@ -1,6 +1,9 @@
 # ShowMe
+
 ## Description
-A navigation software prototype to help the visually impaired people navigate through their ways in an easier way. The idea is to have two pieces of small gadgets in each of the pockets of the person which indicate the direction; be it left or right.
+A navigation software prototype to help the visually impaired people navigate through their ways in an easier way. The idea is to have two pieces of small gadgets in each of the pockets of the person which indicate the direction; be it left or right. a project for Hamburg of applied science university (HAW)
+
+![ShowMe example](showMe.png?raw=true "example")
 
 Currently we are using, as a prototype, two android devices to imitate the vibrating gadgets. The project is developed for Android devices and currently has no support for iOS as it requires a lot of complex configurations to make it cross-platform.
 
